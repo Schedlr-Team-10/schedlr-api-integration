@@ -16,11 +16,16 @@ public class InstaController {
     @Autowired
     private InstagramService instaService;
 
-    @PostMapping("/upload")
-    public String uploadImageToInstagram() {
-        MultipartFile fileName = new FileSystemMultipartFile(new File("./../Images/Groot.jpeg"));
-        String fileType = "jpeg";
-        return instaService.uploadImage(fileName, fileType);
+//    @PostMapping("/upload")
+//    public String uploadImageToInstagram() {
+//        MultipartFile fileName = new FileSystemMultipartFile(new File("./../Images/Groot.jpeg"));
+//        String fileType = "jpeg";
+//        return instaService.uploadImage(fileName, fileType);
+//    }
+
+    @PostMapping("/linkedin")
+    public String Linkedin(){
+        return instaService.callLinkedInAuthorization();
     }
     @GetMapping("/health")
     public String health(){
