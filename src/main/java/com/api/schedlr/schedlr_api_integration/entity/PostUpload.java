@@ -26,4 +26,5 @@ public class PostUpload {
     private LocalDateTime postUploadDate;
 
     // Constructors, getters, and setters
+
 }

@@ -40,13 +40,6 @@ public class LinkedinController {
 
     }
 
-    {
-
-        "image" : imgae.png,
-            "description" : "asdfasdf",
-            "userId" : "121"
-    }
-
     @PostMapping("/uploadPost")
     public String uploadPost(@RequestBody UploadPost uploadPost){
 //@RequestBody UploadPost uploadPost
