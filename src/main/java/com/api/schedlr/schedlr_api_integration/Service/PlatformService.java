@@ -52,15 +52,11 @@ public class PlatformService {
             Profile profile = existingProfile.get();
 
             // Only update if the fields are currently null
-            if (profile.getLinkedInAccessToken() == null) {
-                profile.setLinkedInAccessToken(linkedInAccessToken);
-            }
-            if (profile.getLinkedInAccessTokenExpireDate() == null) {
-                profile.setLinkedInAccessTokenExpireDate(linkedInAccessTokenExpireDate);
-            }
-            if (profile.getLinkedInPersonId() == null) {
-                profile.setLinkedInPersonId(linkedInPersonId);
-            }
+
+            profile.setLinkedInAccessToken(linkedInAccessToken);
+            profile.setLinkedInAccessTokenExpireDate(linkedInAccessTokenExpireDate);
+            profile.setLinkedInPersonId(linkedInPersonId);
+
             System.out.println(5);
             // Save the updated profile
             return profileRepository.save(profile);
@@ -85,6 +81,7 @@ public class PlatformService {
         // Prepare the form data
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
+        System.out.println("Code : "+code);
         body.add("code", code);
         body.add("redirect_uri", APIConstants.LINKEDIN_REDIRECT_URL);
         body.add("client_id", APIConstants.CLIENT_ID);
@@ -110,6 +107,7 @@ public class PlatformService {
             Profile profile=null;
             if(!personId.startsWith("{"));
             {
+                System.out.println("updating");
                 profile = updateLinkedInAccessToken(userId, accessToken, personId);
             }
 
@@ -154,7 +152,7 @@ public class PlatformService {
 //    }
 
     public String getPersonId(String accessToken) {
-        String url = "https://api.linkedin.com/v2/me"; // Use the correct endpoint
+        String url = APIConstants.LINKEDIN_GET_PERSON_ID;
 
         // Set the headers
         HttpHeaders headers = new HttpHeaders();
@@ -163,7 +161,7 @@ public class PlatformService {
 
         // Create an HttpEntity with the headers
         HttpEntity<String> entity = new HttpEntity<>(headers);
-
+        System.out.println("in PersonId method....");
         try {
             // Send the GET request with the headers and capture the response
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
@@ -171,9 +169,9 @@ public class PlatformService {
             // Parse the response body into a Map
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> responseBody = objectMapper.readValue(response.getBody(), Map.class);
-
+            System.out.println("Response : "+ responseBody);
             // Extract the "id" value (not "sub")
-            String personId = responseBody.get("id").toString(); // Adjust this based on the actual response
+            String personId = responseBody.get("sub").toString(); // Adjust this based on the actual response
 
             return personId;
 

@@ -14,8 +14,12 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +35,7 @@ public class LinkedinService {
     ProfileRepository profileRepository;
 
     public String uploadPostLinkedIn(int userId, MultipartFile image, String postDescription){
-
+        System.out.println("Called uploadPostLinkedIn");
         Optional<LinkedInData> data = getLinkedInPersonId(userId);
         if(data==null){
            return "Failed to retreive from DB";
@@ -39,12 +43,13 @@ public class LinkedinService {
         String accessToken = data.get().getAccessToken();
         String personId = data.get().getPersonId();
 
-        Map<String, Object> uploadImageJson = registerUpload(accessToken, personId);
+        Map<String, String> uploadImageJson = registerUpload(accessToken, personId);
         System.out.println("JSON Response: "+uploadImageJson);
         if(uploadImageJson==null){
             return "Failed to upload Image in the url";
         }
-        String asset="", uploadUrl="";
+        String asset=uploadImageJson.get("asset");
+        String uploadUrl=uploadImageJson.get("uploadUrl");
 //        String asset = (String) uploadImageJson.get("asset");
 //        // Extract the uploadMechanism map first
 //        Map<String, Object> uploadMechanism = (Map<String, Object>) valueMap.get("uploadMechanism");
@@ -54,13 +59,13 @@ public class LinkedinService {
 //
 //// Now extract the uploadUrl
 //        String uploadUrl = (String) mediaUploadHttpRequest.get("uploadUrl");
-
-        uploadImage(uploadUrl, image);
+        System.out.println("Image : "+ image);
+        uploadImage(uploadUrl, image, accessToken);
 
         createShare(accessToken, asset, String.valueOf(userId), postDescription);
 
 
-        return null;
+        return "Ok";
     }
 
     public Optional<LinkedInData> getLinkedInPersonId(int userId) {
@@ -74,7 +79,7 @@ public class LinkedinService {
         return Optional.empty();
     }
 
-    public Map<String, Object> registerUpload(String accessToken, String personId) {
+    public Map<String, String> registerUpload(String accessToken, String personId) {
         String url = "https://api.linkedin.com/v2/assets?action=registerUpload";
 
         try {
@@ -111,7 +116,7 @@ public class LinkedinService {
             System.out.println("uploadUrl : "+ uploadUrl);
             System.out.println("asset : "+ asset);
 
-            return null;
+            return result;
 
         } catch (HttpClientErrorException e) {
             // Handle error responses (e.g., 401 Unauthorized, 403 Forbidden, etc.)
@@ -142,90 +147,48 @@ public class LinkedinService {
         return objectMapper.writeValueAsString(requestBody);
     }
 
-//    public ResponseEntity<String> uploadImage(String uploadUrl, MultipartFile multipartFile) {
-//        try {
-//            // Create headers
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setBearerAuth(APIConstants.ClIENT_ACCESS_TOKEN);
-//            headers.setContentType(MediaType.MULTIPART_FORM_DATA); // Set content type for multipart data
-//
-//            // Create MultiValueMap to hold the file
-//            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-//
-//            // Create a Resource from the MultipartFile
-//            ByteArrayResource byteArrayResource = new ByteArrayResource(multipartFile.getBytes()) {
-//                @Override
-//                public String getFilename() {
-//                    return multipartFile.getOriginalFilename(); // Return original filename
-//                }
-//            };
-//
-//            // Add the file to the request body
-//            body.add("file", byteArrayResource);
-//
-//            // Create HttpEntity with the file data and headers
-//            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-//
-//            // Execute the request
-//            ResponseEntity<String> response = restTemplate.exchange(uploadUrl, HttpMethod.POST, requestEntity, String.class);
-//
-//            return response;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<>("File upload failed", HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-//
-////        public ResponseEntity<String> uploadImage(String uploadUrl, String filePath) {
-////        try {
-////            FileSystemResource resource = new FileSystemResource(new File(filePath));
-////            System.out.println(resource);
-////            // Create headers
-////            HttpHeaders headers = new HttpHeaders();
-////            headers.setBearerAuth(APIConstants.ClIENT_ACCESS_TOKEN);
-////            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-////
-////            // Create HttpEntity with the file data
-////            HttpEntity<FileSystemResource> requestEntity = new HttpEntity<>(resource, headers);
-////
-////            // Execute the request
-////            ResponseEntity<String> response = restTemplate.exchange(uploadUrl, HttpMethod.POST, requestEntity, String.class);
-////
-////            return response;
-////        } catch (Exception e) {
-////            e.printStackTrace();
-////            return new ResponseEntity<>("File upload failed", HttpStatus.INTERNAL_SERVER_ERROR);
-////        }
-////    }
-//
-
-
-    public ResponseEntity<String> uploadImage(String uploadUrl, MultipartFile imageFile) {
+    public ResponseEntity<String> uploadImage(String uploadUrl, MultipartFile imageFile, String accessToken) {
         try {
-            // Convert MultipartFile to File
+            System.out.println("Called uploadImage" + uploadUrl);
+            // Validate the URL
+            URI uri = UriComponentsBuilder.fromUriString(uploadUrl).build().toUri();
+
+            // Convert MultipartFile to a temporary File (if necessary)
             File tempFile = File.createTempFile("upload", imageFile.getOriginalFilename());
             imageFile.transferTo(tempFile);
 
             // Create headers
             HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth("YOUR_ACCESS_TOKEN");  // Replace with your access token
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setBearerAuth(accessToken);  // Set the Bearer token for LinkedIn API
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);  // Set content type as binary stream
 
-            // Create HttpEntity with the file data
+            // Create HttpEntity with file data
             HttpEntity<FileSystemResource> requestEntity = new HttpEntity<>(new FileSystemResource(tempFile), headers);
+            System.out.println("Called uploadImage 2 : "+ uri);
+            // Execute the request using the valid URI
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String.class);
 
-            // Execute the request
-            ResponseEntity<String> response = restTemplate.exchange(uploadUrl, HttpMethod.POST, requestEntity, String.class);
+            System.out.println("Upload Response: " + response);
 
             // Clean up the temporary file
-            tempFile.delete();
+            boolean isDeleted = tempFile.delete();
+            if (!isDeleted) {
+                System.out.println("Temporary file deletion failed: " + tempFile.getAbsolutePath());
+            }
 
             return response;
-        } catch (Exception e) {
+        } catch (IOException e) {
+            System.err.println("File processing failed: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(500).body("File upload failed");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File processing failed");
+        } catch (Exception e) {
+            System.err.println("File upload failed: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
         }
     }
+
 
     // Step 2: Create the share with the uploaded media
     public ResponseEntity<String> createShare(String accessToken, String asset, String userId, String commentary) {

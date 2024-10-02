@@ -3,6 +3,7 @@ package com.api.schedlr.schedlr_api_integration.controllers;
 import com.api.schedlr.schedlr_api_integration.DTOs.UploadPost;
 import com.api.schedlr.schedlr_api_integration.Service.LinkedinService;
 import com.api.schedlr.schedlr_api_integration.Service.PlatformService;
+import com.api.schedlr.schedlr_api_integration.util.FileSystemMultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,21 +31,23 @@ public class LinkedinController {
         return "Thanks Linkedin";
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/authCode")
     public String handleLinkedInAuthCode(@RequestBody Map<String, String> requestBody) {
         String code = requestBody.get("code");
         String state = requestBody.get("state");
         int userId = Integer.parseInt(requestBody.get("userId"));
+        System.out.println("Thank god it called me..!!");
         return platformService.getAccessToken(userId,code,state);
 
     }
 
     @PostMapping("/uploadPost")
-    public String uploadPost(@RequestBody UploadPost uploadPost){
+    public String uploadPost() throws IOException {
 //@RequestBody UploadPost uploadPost
         String filePath = "src/main/java/com/api/schedlr/schedlr_api_integration/images/Groot.jpeg";
-        return linkedinService.uploadPostLinkedIn(1,null,"as");
+        FileSystemMultipartFile f = new FileSystemMultipartFile();
+        MultipartFile multipartFile = f.createMultipartFile(filePath);
+        return linkedinService.uploadPostLinkedIn(1,multipartFile,"Description");
 
     }
 
