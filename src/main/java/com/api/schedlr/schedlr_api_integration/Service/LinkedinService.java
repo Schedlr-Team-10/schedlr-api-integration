@@ -1,25 +1,30 @@
 package com.api.schedlr.schedlr_api_integration.Service;
-import com.api.schedlr.schedlr_api_integration.Constants.APIConstants;
 import com.api.schedlr.schedlr_api_integration.DTOs.LinkedInData;
 import com.api.schedlr.schedlr_api_integration.repo.ProfileRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient; // Use classes from Apache HttpClient 5.x
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +41,7 @@ public class LinkedinService {
 
     public String uploadPostLinkedIn(int userId, MultipartFile image, String postDescription){
         System.out.println("Called uploadPostLinkedIn");
-        Optional<LinkedInData> data = getLinkedInPersonId(userId);
+        Optional<LinkedInData> data = getLinkedInAccessTokenAndPersonId(userId);
         if(data==null){
            return "Failed to retreive from DB";
         }
@@ -44,22 +49,14 @@ public class LinkedinService {
         String personId = data.get().getPersonId();
 
         Map<String, String> uploadImageJson = registerUpload(accessToken, personId);
-        System.out.println("JSON Response: "+uploadImageJson);
+
         if(uploadImageJson==null){
             return "Failed to upload Image in the url";
         }
+
         String asset=uploadImageJson.get("asset");
         String uploadUrl=uploadImageJson.get("uploadUrl");
-//        String asset = (String) uploadImageJson.get("asset");
-//        // Extract the uploadMechanism map first
-//        Map<String, Object> uploadMechanism = (Map<String, Object>) valueMap.get("uploadMechanism");
-//
-//// Get the inner map for MediaUploadHttpRequest
-//        Map<String, Object> mediaUploadHttpRequest = (Map<String, Object>) uploadMechanism.get("com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest");
-//
-//// Now extract the uploadUrl
-//        String uploadUrl = (String) mediaUploadHttpRequest.get("uploadUrl");
-        System.out.println("Image : "+ image);
+
         uploadImage(uploadUrl, image, accessToken);
 
         createShare(accessToken, asset, String.valueOf(userId), postDescription);
@@ -68,7 +65,7 @@ public class LinkedinService {
         return "Ok";
     }
 
-    public Optional<LinkedInData> getLinkedInPersonId(int userId) {
+    public Optional<LinkedInData> getLinkedInAccessTokenAndPersonId(int userId) {
         List<Object[]> listOfRows= profileRepository.findLinkedInTokenAndPersonIdByUserId(userId);
         if (listOfRows.size()!=0) {
             Object[] data = listOfRows.get(0);
@@ -149,29 +146,24 @@ public class LinkedinService {
 
     public ResponseEntity<String> uploadImage(String uploadUrl, MultipartFile imageFile, String accessToken) {
         try {
-            System.out.println("Called uploadImage" + uploadUrl);
-            // Validate the URL
+
             URI uri = UriComponentsBuilder.fromUriString(uploadUrl).build().toUri();
 
-            // Convert MultipartFile to a temporary File (if necessary)
             File tempFile = File.createTempFile("upload", imageFile.getOriginalFilename());
             imageFile.transferTo(tempFile);
 
-            // Create headers
             HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(accessToken);  // Set the Bearer token for LinkedIn API
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);  // Set content type as binary stream
+            headers.setBearerAuth(accessToken);
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 
-            // Create HttpEntity with file data
             HttpEntity<FileSystemResource> requestEntity = new HttpEntity<>(new FileSystemResource(tempFile), headers);
             System.out.println("Called uploadImage 2 : "+ uri);
-            // Execute the request using the valid URI
+
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String.class);
 
             System.out.println("Upload Response: " + response);
 
-            // Clean up the temporary file
             boolean isDeleted = tempFile.delete();
             if (!isDeleted) {
                 System.out.println("Temporary file deletion failed: " + tempFile.getAbsolutePath());
@@ -189,10 +181,8 @@ public class LinkedinService {
         }
     }
 
-
-    // Step 2: Create the share with the uploaded media
     public ResponseEntity<String> createShare(String accessToken, String asset, String userId, String commentary) {
-        String url = "https://api.linkedin.com/v2/ugcPosts";
+        String url = "https://api.linkedin.com/v2/ugcPosts"; // Replace with your actual API URL
 
         try {
             // Create the request body
@@ -200,21 +190,23 @@ public class LinkedinService {
             shareBody.put("author", "urn:li:person:" + userId);
             shareBody.put("lifecycleState", "PUBLISHED");
 
-            Map<String, Object> specificContent = new HashMap<>();
             Map<String, Object> shareContent = new HashMap<>();
             Map<String, Object> shareCommentary = new HashMap<>();
             shareCommentary.put("text", commentary);
             shareContent.put("shareCommentary", shareCommentary);
             shareContent.put("shareMediaCategory", "IMAGE");
 
+            // Add media details to the request
             Map<String, Object> media = new HashMap<>();
             media.put("status", "READY");
             media.put("media", asset);
-            specificContent.put("com.linkedin.ugc.ShareContent", shareContent);
-            specificContent.put("media", new Map[]{media});
+            shareContent.put("media", new Map[]{media});
 
+            Map<String, Object> specificContent = new HashMap<>();
+            specificContent.put("com.linkedin.ugc.ShareContent", shareContent);
             shareBody.put("specificContent", specificContent);
 
+            // Set visibility to public
             Map<String, Object> visibility = new HashMap<>();
             visibility.put("com.linkedin.ugc.MemberNetworkVisibility", "PUBLIC");
             shareBody.put("visibility", visibility);
@@ -224,8 +216,11 @@ public class LinkedinService {
             headers.set("Authorization", "Bearer " + accessToken);
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // Create HttpEntity with the headers and body
+            // Create HttpEntity with headers and body
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(shareBody, headers);
+
+            // Configure RestTemplate to use HttpComponentsClientHttpRequestFactory
+            RestTemplate restTemplate = getCustomRestTemplate();
 
             // Send the POST request
             return restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
@@ -235,9 +230,11 @@ public class LinkedinService {
         }
     }
 
+    public RestTemplate getCustomRestTemplate() {
+        CloseableHttpClient httpClient = HttpClients.createDefault(); // Apache HttpClient 5.x
 
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
-
-
-
+        return new RestTemplate(factory);
+    }
 }
