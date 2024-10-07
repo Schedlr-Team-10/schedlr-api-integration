@@ -6,6 +6,7 @@ import com.api.schedlr.schedlr_api_integration.entity.User;
 import com.api.schedlr.schedlr_api_integration.repo.ProfileRepository;
 import com.api.schedlr.schedlr_api_integration.repo.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class PlatformService {
 
@@ -33,19 +35,17 @@ public class PlatformService {
     public Profile updateLinkedInAccessToken(int userId, String linkedInAccessToken, String linkedInPersonId) {
         // Fetch the User entity using userId
         Optional<User> userOptional = userRepository.findById(userId);
-        System.out.println(1);
         // Check if the user exists
         if (!userOptional.isPresent()) {
             throw new IllegalArgumentException("User with ID " + userId + " not found.");
         }
-        System.out.println(2);
+
         // Get the User object
         User user = userOptional.get();
 
-        System.out.println(3);
         // Get current date and add 45 days
         LocalDateTime linkedInAccessTokenExpireDate = LocalDateTime.now().plusDays(45);
-        System.out.println(4);
+
         Optional<Profile> existingProfile = profileRepository.findByUserId(userId);
         // If profile exists, update the LinkedIn-related fields if they are null
         if (existingProfile.isPresent()) {
@@ -57,18 +57,15 @@ public class PlatformService {
             profile.setLinkedInAccessTokenExpireDate(linkedInAccessTokenExpireDate);
             profile.setLinkedInPersonId(linkedInPersonId);
 
-            System.out.println(5);
             // Save the updated profile
             return profileRepository.save(profile);
         } else {
             // If profile doesn't exist, create a new one
             Profile newProfile = new Profile();
-            System.out.println("7. "+user.getUserid());
             newProfile.setUserId(user.getUserid());  // Set the User object
             newProfile.setLinkedInAccessToken(linkedInAccessToken);
             newProfile.setLinkedInAccessTokenExpireDate(linkedInAccessTokenExpireDate);
             newProfile.setLinkedInPersonId(linkedInPersonId);
-            System.out.println(6);
             // Save the new profile
             return profileRepository.save(newProfile);
         }
@@ -81,7 +78,7 @@ public class PlatformService {
         // Prepare the form data
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        System.out.println("Code : "+code);
+        log.info("Code : "+code);
         body.add("code", code);
         body.add("redirect_uri", APIConstants.LINKEDIN_REDIRECT_URL);
         body.add("client_id", APIConstants.CLIENT_ID);
@@ -100,14 +97,14 @@ public class PlatformService {
 
             // Extract access token from the response
             String accessToken = (String) response.getBody().get("access_token");
-            System.out.println("Got it : "+accessToken);
+            log.info("Got it : "+accessToken);
 
             String personId = getPersonId(accessToken);
-            System.out.println("PersonId: "+personId);
+            log.info("PersonId: "+personId);
             Profile profile=null;
             if(!personId.startsWith("{"));
             {
-                System.out.println("updating");
+                log.info("updating");
                 profile = updateLinkedInAccessToken(userId, accessToken, personId);
             }
 
@@ -161,7 +158,7 @@ public class PlatformService {
 
         // Create an HttpEntity with the headers
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        System.out.println("in PersonId method....");
+        log.info("in PersonId method....");
         try {
             // Send the GET request with the headers and capture the response
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
@@ -169,7 +166,7 @@ public class PlatformService {
             // Parse the response body into a Map
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> responseBody = objectMapper.readValue(response.getBody(), Map.class);
-            System.out.println("Response : "+ responseBody);
+            log.info("Response : "+ responseBody);
             // Extract the "id" value (not "sub")
             String personId = responseBody.get("sub").toString(); // Adjust this based on the actual response
 
