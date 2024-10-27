@@ -29,5 +29,9 @@ public class Profile {
     private String twitterAccessToken;
     private LocalDateTime twitterAccessTokenExpireDate;
 
+    @Lob
+    private String pinterestAccessToken;
+    private LocalDateTime pinterestAccessTokenExpireDate;
+
     // Constructors, getters, and setters
 }

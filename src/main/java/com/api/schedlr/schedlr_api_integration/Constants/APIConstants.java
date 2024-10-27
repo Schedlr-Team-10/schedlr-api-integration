@@ -12,4 +12,12 @@ public class APIConstants {
     public static final String appId = "1232937608014970";
     //public static final String ClIENT_ACCESS_TOKEN = "AQWhAX3yK7PDAy-rbKpW0hKthfLaqE_WpxGy2PqoR6cRx3IqE-hxWq8aVTx45JrgHApZbYVYFdEFOimpPmfd4CSNvzWyhoLaps_Q3wSWZ371rFdj4CEZLvlhIWT2UfeGDFjqCJB4Zcxyp8kAsVV_SVQ45xi4Ek58l4nD1JkMok_rYDF83dX0PMseX71iUWWCtieN4BsPtBoVeJI3X6FnQYwJjv456JABTSb2DAoqyPM9WRUizUU_ayl5z_-mM7OzsfPLN1qhrDN97OWNCszLTKDzuaSvajbeynzvgKJR_MAS78xCibvG0_baz2dWeb6ovzKhhV9sZjipeSbXtWMHtwd9GYIEvw";
 
+    public static final String PINTEREST_OAUTH_URL = "https://api.pinterest.com/v5/oauth/token";
+    public static final String PINTEREST_CLIENT_ID = "1506052";
+    public static final String PINTEREST_CLIENT_SECRET = "1486a9ea2593e42736ad3a819dd0ab8d9c25aed7";
+    public static final String PINTEREST_REDIRECT_URL = "http://localhost:3000/pinterestStatus";
+
+
+
+
 }

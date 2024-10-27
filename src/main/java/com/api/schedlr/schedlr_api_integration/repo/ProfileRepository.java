@@ -15,4 +15,5 @@ public interface ProfileRepository extends JpaRepository<Profile, Integer> {
 
     @Query("SELECT p.linkedInAccessToken, p.linkedInPersonId FROM Profile p WHERE p.userId = :userId")
     List<Object[]> findLinkedInTokenAndPersonIdByUserId(int userId);
+
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -63,7 +64,6 @@ public class LinkedinService {
         uploadImage(uploadUrl, image, accessToken);
 
         postUGC(accessToken, personId, asset, postDescription, "mediaDescription", "mediaTitle");
-
 
         return "Ok";
     }
@@ -187,71 +187,13 @@ public class LinkedinService {
         }
     }
 
-//    public ResponseEntity<String> createShare(String accessToken, String asset, String userId, String commentary) {
-//        String url = "https://api.linkedin.com/v2/ugcPosts"; // Replace with your actual API URL
-//
-//        try {
-//            // Create the request body
-//            Map<String, Object> shareBody = new HashMap<>();
-//            shareBody.put("author", "urn:li:person:" + userId);
-//            shareBody.put("lifecycleState", "PUBLISHED");
-//
-//            Map<String, Object> shareContent = new HashMap<>();
-//            Map<String, Object> shareCommentary = new HashMap<>();
-//            shareCommentary.put("text", commentary);
-//            shareContent.put("shareCommentary", shareCommentary);
-//            shareContent.put("shareMediaCategory", "IMAGE");
-//
-//            // Add media details to the request
-//            Map<String, Object> media = new HashMap<>();
-//            media.put("status", "READY");
-//            media.put("media", asset);
-//            shareContent.put("media", new Map[]{media});
-//
-//            Map<String, Object> specificContent = new HashMap<>();
-//            specificContent.put("com.linkedin.ugc.ShareContent", shareContent);
-//            shareBody.put("specificContent", specificContent);
-//
-//            // Set visibility to public
-//            Map<String, Object> visibility = new HashMap<>();
-//            visibility.put("com.linkedin.ugc.MemberNetworkVisibility", "PUBLIC");
-//            shareBody.put("visibility", visibility);
-//
-//            // Set headers
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.set("Authorization", "Bearer " + accessToken);
-//            headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//            // Create HttpEntity with headers and body
-//            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(shareBody, headers);
-//
-//            // Configure RestTemplate to use HttpComponentsClientHttpRequestFactory
-//            RestTemplate restTemplate = getCustomRestTemplate();
-//
-//            // Send the POST request
-//            return restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(500).body("Share creation failed");
-//        }
-//    }
-//
-//    public RestTemplate getCustomRestTemplate() {
-//        CloseableHttpClient httpClient = HttpClients.createDefault(); // Apache HttpClient 5.x
-//
-//        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
-//
-//        return new RestTemplate(factory);
-//    }
-
     public String postUGC(String accessToken, String personUrn, String mediaUrn, String postText, String mediaDescription, String mediaTitle) {
-
-        log.info("AccessToken: "+accessToken);
-        log.info("PersonID: "+personUrn);
-        log.info("Asset: "+mediaUrn);
-        log.info("PostText: "+postText);
-        log.info("MediaDescription: "+mediaDescription);
-        log.info("MediaTitle: "+ mediaTitle);
+        log.info("AccessToken: " + accessToken);
+        log.info("PersonID: " + personUrn);
+        log.info("Asset: " + mediaUrn);
+        log.info("PostText: " + postText);
+        log.info("MediaDescription: " + mediaDescription);
+        log.info("MediaTitle: " + mediaTitle);
 
         // Create headers
         HttpHeaders headers = new HttpHeaders();
@@ -259,7 +201,7 @@ public class LinkedinService {
         headers.set("X-Restli-Protocol-Version", "2.0.0");
         headers.setBearerAuth(accessToken);
 
-        // Create body
+        // Create body with proper JSON serialization
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("author", "urn:li:person:" + personUrn);
         requestBody.put("lifecycleState", "PUBLISHED");
@@ -291,18 +233,27 @@ public class LinkedinService {
                 "com.linkedin.ugc.MemberNetworkVisibility", "PUBLIC" // Or "CONNECTIONS"
         ));
 
-        // Create request entity
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-
-        // Send request
-        RestTemplate restTemplate = new RestTemplate();
         try {
-            ResponseEntity<String> response = restTemplate.exchange(APIConstants.LINKEDIN_POST_IMAGE, HttpMethod.POST, request, String.class);
+            // Serialize requestBody to JSON string
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonBody = objectMapper.writeValueAsString(requestBody);
+
+            // Create request entity with JSON string
+            HttpEntity<String> request = new HttpEntity<>(jsonBody, headers);
+
+            // Send request
+            RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
+            ResponseEntity<String> response = restTemplate.exchange(
+                    APIConstants.LINKEDIN_POST_IMAGE,
+                    HttpMethod.POST,
+                    request,
+                    String.class
+            );
             return response.getBody();
-        } catch (HttpClientErrorException e) {
-            // Handle error response and log the issue
-            System.err.println("Error occurred while posting to LinkedIn: " + e.getResponseBodyAsString());
-            throw e;
+        } catch (Exception e) {
+            // Handle and log error
+            System.err.println("Error occurred while posting to LinkedIn: " + e.getMessage());
+            throw new RuntimeException("Failed to post UGC", e);
         }
     }
 }

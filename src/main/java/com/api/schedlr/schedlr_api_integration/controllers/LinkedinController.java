@@ -54,8 +54,8 @@ public class LinkedinController {
     @GetMapping("/upload-image")
     public String uploadImage() throws IOException {
         String uploadUrl = "https://www.linkedin.com/dms-uploads/sp/D5622AQGv3PI-R6CH5g/uploaded-image/0?ca=vector_feedshare&cn=uploads&sync=0&v=beta&ut=2JXjezH1o4nbs1";  // Replace with the URL received from step 1
-        String filePath = "src/main/java/com/api/schedlr/schedlr_api_integration/images/Groot.jpeg";  // Path to the file on your local system
-        String description = "Posting an image in linkedin using my application. I'm happy if it works..!!";
+        String filePath = "src/main/java/com/api/schedlr/schedlr_api_integration/images/spdierman.jpg";  // Path to the file on your local system
+        String description = "WITH GREAT POWER COMES GREAT RESPONSIBILITY";
         File file = new File(filePath);
         FileInputStream input = new FileInputStream(file);
 
