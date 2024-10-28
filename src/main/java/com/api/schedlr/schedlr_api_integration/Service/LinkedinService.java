@@ -249,6 +249,7 @@ public class LinkedinService {
                     request,
                     String.class
             );
+            log.info("Response Body : "+response.getBody());
             return response.getBody();
         } catch (Exception e) {
             // Handle and log error
