@@ -38,6 +38,6 @@ public class PInterestController {
                               @RequestParam("uploadImage") MultipartFile uploadImage,
                               @RequestParam("description") String description) throws IOException {
         log.info("Request"+ description);
-        return null;//linkedinService.uploadPostLinkedIn(Integer.parseInt(userId), uploadImage, description);
+        return pInterestService.createPin(uploadImage, description, userId);
     }
 }

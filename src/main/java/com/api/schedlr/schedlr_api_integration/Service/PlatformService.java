@@ -52,6 +52,7 @@ public class PlatformService {
         // If profile exists, update the LinkedIn-related fields if they are null
         if (existingProfile.isPresent()) {
             Profile profile = existingProfile.get();
+            log.info("Profile is : "+profile);
 
             // Only update if the fields are currently null
 

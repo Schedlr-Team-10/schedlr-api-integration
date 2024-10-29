@@ -31,6 +31,8 @@ public class LinkedinController {
         String code = requestBody.get("code");
         String state = requestBody.get("state");
         int userId = Integer.parseInt(requestBody.get("userId"));
+        log.info("UserId: "+userId);
+
         System.out.println("Thank god it called me..!!");
         return platformService.getAccessToken(userId,code,state);
     }
