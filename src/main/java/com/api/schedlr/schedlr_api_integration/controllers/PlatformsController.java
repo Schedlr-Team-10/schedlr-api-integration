@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -46,37 +43,7 @@ public class PlatformsController {
                               @RequestParam("uploadImage") MultipartFile uploadImage,
                               @RequestParam("description") String description,
                               @RequestParam("platforms") String platformsJson) throws IOException, JSONException {
-//        log.info("Request"+ platformsJson);
-//        String status="";
-//        try {
-//            byte[] imageBytes = uploadImage.getBytes();
-//            JSONArray jsonArray = new JSONArray(platformsJson);
-//            List<String> platforms = new ArrayList<>();
-//
-//            for (int i = 0; i < jsonArray.length(); i++) {
-//                platforms.add(jsonArray.getString(i));
-//            }
-//
-//            if (platforms.contains("LinkedIn")) {
-//                linkedinService.uploadPostLinkedIn(Integer.parseInt(userId), new MockMultipartFile(uploadImage.getName(), imageBytes), description);
-//                status+="Successfully posted on LinkedIn\n";
-//            }
-//            if (platforms.contains("PInterest")) {
-//                pInterestService.createPin(new MockMultipartFile(uploadImage.getName(), imageBytes), description, userId);
-//                status+="Successfully posted on Pinterest\n";
-//            }
-//            if (platforms.contains("Twitter")) {
-//                // Call Twitter service here
-//                //status.append("Successfully posted on Twitter");
-//            }
-//
-//            return ResponseEntity.ok(status);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("Error processing the post upload request.");
-//        }
+
         JSONArray jsonArray = new JSONArray(platformsJson);
         List<String> platforms = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -115,4 +82,18 @@ public class PlatformsController {
         postUploadRepository.save(postUpload);
         return null;
     }
+
+    @GetMapping("/health2")
+    public String getUserPosts() {
+        return "Good2";
+    }
+    @GetMapping("/posthistory")
+    public ResponseEntity<List<PostUpload>> getUserPosts(@RequestParam("userId") Integer userId) {
+        List<PostUpload> posts = postUploadRepository.findByUserId(userId);
+        if (posts.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Return 204 if no posts found
+        }
+        return ResponseEntity.ok(posts); // Return the list of posts
+    }
+
 }
