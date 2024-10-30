@@ -1,30 +1,43 @@
 package com.api.schedlr.schedlr_api_integration.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "postUpload")
+@Data
+@Table(name = "post_upload")
 public class PostUpload {
 
     @Id
-    private int postId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_id")
+    private Integer postId;
 
-    @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
 
-    private String image;
+    @Lob
+    @Column(name = "image", columnDefinition = "LONGBLOB")
+    private byte[] image;
+
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "fb_post_id")
     private String fbPostId;
-    private String instaPostId;
+
+    @Column(name = "pinterest_post_id")
+    private String pinterestPostId;
+
+    @Column(name = "twitter_post_id")
     private String twitterPostId;
-    private String linkedInPostId;
 
+    @Column(name = "linkedin_post_id")
+    private String linkedinPostId;
+
+    @Column(name = "post_upload_date")
     private LocalDateTime postUploadDate;
-
-    // Constructors, getters, and setters
 
 }

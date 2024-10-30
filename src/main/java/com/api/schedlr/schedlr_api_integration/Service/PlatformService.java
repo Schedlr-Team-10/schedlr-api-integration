@@ -1,32 +1,42 @@
 package com.api.schedlr.schedlr_api_integration.Service;
 
 import com.api.schedlr.schedlr_api_integration.Constants.APIConstants;
+import com.api.schedlr.schedlr_api_integration.entity.PostUpload;
 import com.api.schedlr.schedlr_api_integration.entity.Profile;
 import com.api.schedlr.schedlr_api_integration.entity.User;
+import com.api.schedlr.schedlr_api_integration.repo.PostUploadRepository;
 import com.api.schedlr.schedlr_api_integration.repo.ProfileRepository;
 import com.api.schedlr.schedlr_api_integration.repo.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
 public class PlatformService {
     @Autowired
     RestTemplate restTemplate;
+
+    private static final LinkedinService linkedinService = new LinkedinService();
+
+    @Autowired
+    static PInterestService pInterestService;
+
+    @Autowired
+    private static PostUploadRepository postUploadRepository;
 
     @Autowired
     private ProfileRepository profileRepository;
@@ -238,4 +248,47 @@ public class PlatformService {
             return profileRepository.save(newProfile);
         }
     }
+
+    public static String storeDetails(int userId, MultipartFile uploadImage, String description, List<String> platforms) throws IOException {
+        log.info("Called storedDetails method....!!" +  platforms);
+        byte[] imageBytes = uploadImage.getBytes();
+
+        PostUpload postUpload = new PostUpload();
+        postUpload.setUserId(userId);
+
+        try {
+            log.info("Setting image in the postupload");
+            postUpload.setImage(uploadImage.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "Error storing image.";
+        }
+        log.info("Setting description in the postupload");
+        postUpload.setDescription(description);
+
+        log.info("Setting date in the postupload");
+        postUpload.setPostUploadDate(LocalDateTime.now());
+
+        log.info("checking the condition");
+        if (platforms.contains("LinkedIn")) {
+            log.info("Calling linkedin service method");
+            String postId = linkedinService.uploadPostLinkedIn(userId, new MockMultipartFile(uploadImage.getName(), imageBytes), description);
+            postUpload.setLinkedinPostId(postId);
+        }
+        if (platforms.contains("PInterest")) {
+            String postId = pInterestService.createPin(new MockMultipartFile(uploadImage.getName(), imageBytes), description, String.valueOf(userId));
+            postUpload.setPinterestPostId(postId);
+        }
+        if (platforms.contains("Twitter")) {
+
+        }
+
+        //postUploadRepository.save(postUpload);
+
+        return "Post uploaded successfully.";
+    }
+
+
+
+
 }
