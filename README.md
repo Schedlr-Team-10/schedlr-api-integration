@@ -28,28 +28,29 @@ CREATE TABLE profiles (
     CONSTRAINT FOREIGN KEY (user_id) REFERENCES users(userid)
 );
 
+use schedlr;
 CREATE TABLE post_upload (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    image VARCHAR(255),
+    image LONGBLOB,
     description TEXT,
-    fbPost_id VARCHAR(100),
-    insta_post_id VARCHAR(100),
+    fb_post_id VARCHAR(100),
+    pinterest_post_id VARCHAR(100),
     twitter_post_id VARCHAR(100),
-    linked_in_post_id VARCHAR(100),
+    linkedin_post_id VARCHAR(100),
     post_upload_date datetime,
     CONSTRAINT FOREIGN KEY (user_id) REFERENCES users(userid)
 );
 
-CREATE TABLE schedule_post_upload (
+CREATE TABLE schedlr.schedule_post_upload (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    image VARCHAR(255),
+    image longblob,
     description TEXT,
     schedule_time DATETIME NOT NULL,
     fb BOOLEAN DEFAULT FALSE,
-    insta BOOLEAN DEFAULT FALSE,
+    pinterest BOOLEAN DEFAULT FALSE,
     twitter BOOLEAN DEFAULT FALSE,
-    linked_in BOOLEAN DEFAULT FALSE,
+    linkedin BOOLEAN DEFAULT FALSE,
     CONSTRAINT FOREIGN KEY (user_id) REFERENCES users(userid)
 );
