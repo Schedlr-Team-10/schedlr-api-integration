@@ -11,6 +11,11 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     account_type ENUM('personal', 'business') NOT NULL DEFAULT 'personal'
 );
+
+ALTER TABLE users
+MODIFY COLUMN account_type ENUM('INFLUENCER', 'PERSONAL') NOT NULL DEFAULT 'PERSONAL';
+
+
 CREATE TABLE profiles (
     profile_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
