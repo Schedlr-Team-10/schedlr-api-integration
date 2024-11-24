@@ -33,10 +33,6 @@ public class User {
     // Constructors, getters, and setters
 
     public enum AccountType {
-        PERSONAL, BUSINESS
+        PERSONAL, INFLUENCER
     }
-
-    // Add relationships with other entities if necessary
-
-    // Getters and setters
 }

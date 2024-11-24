@@ -3,9 +3,11 @@ package com.api.schedlr.schedlr_api_integration.Service;
 import com.api.schedlr.schedlr_api_integration.Constants.APIConstants;
 import com.api.schedlr.schedlr_api_integration.entity.PostUpload;
 import com.api.schedlr.schedlr_api_integration.entity.Profile;
+import com.api.schedlr.schedlr_api_integration.entity.SchedulePostUpload;
 import com.api.schedlr.schedlr_api_integration.entity.User;
 import com.api.schedlr.schedlr_api_integration.repo.PostUploadRepository;
 import com.api.schedlr.schedlr_api_integration.repo.ProfileRepository;
+import com.api.schedlr.schedlr_api_integration.repo.SchedulePostUploadRepository;
 import com.api.schedlr.schedlr_api_integration.repo.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,9 @@ public class PlatformService {
 
     @Autowired
     static PInterestService pInterestService;
+
+    @Autowired
+    private SchedulePostUploadRepository schedulePostUploadRepository;
 
     @Autowired
     private static PostUploadRepository postUploadRepository;
@@ -288,7 +293,9 @@ public class PlatformService {
         return "Post uploaded successfully.";
     }
 
-
+    public SchedulePostUpload schedulePost(SchedulePostUpload post) {
+        return schedulePostUploadRepository.save(post);
+    }
 
 
 }

@@ -1,29 +1,42 @@
 package com.api.schedlr.schedlr_api_integration.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
-
+@Data
 @Entity
-@Table(name = "schedulePostUpload")
+@Table(name = "schedule_post_upload")
 public class SchedulePostUpload {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int postId;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private String image;
+    @Lob
+    @Column(name = "image", columnDefinition = "LONGBLOB")
+    private byte[] image;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "schedule_time", nullable = false)
     private LocalDateTime scheduleTime;
 
+    @Column(nullable = false)
     private boolean fb = false;
-    private boolean insta = false;
-    private boolean twitter = false;
-    private boolean linkedIn = false;
 
-    // Constructors, getters, and setters
+    @Column(nullable = false)
+    private boolean pinterest = false;
+
+    @Column(nullable = false)
+    private boolean twitter = false;
+
+    @Column(nullable = false)
+    private boolean linkedin = false;
+
 }
