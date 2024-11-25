@@ -28,7 +28,7 @@ public class Collaboration {
     @Column(name = "status", nullable = false)
     private Status status = Status.PENDING;
 
-    @Column(name = "collaboration_token", nullable = false, unique = true)
+    @Column(name = "collaboration_token", nullable = true, unique = true)
     private String collaborationToken;
 
     public enum Status {

@@ -30,6 +30,12 @@ public class User {
     @Column(nullable = false)
     private AccountType accountType = AccountType.PERSONAL;
 
+    @Lob
+    private byte[] profilepic;
+
+    @Lob
+    private String bio;
+
     // Constructors, getters, and setters
 
     public enum AccountType {
