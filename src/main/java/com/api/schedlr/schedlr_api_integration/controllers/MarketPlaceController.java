@@ -2,9 +2,11 @@ package com.api.schedlr.schedlr_api_integration.controllers;
 
 
 import com.api.schedlr.schedlr_api_integration.DTOs.CollaborationRequestDto;
+import com.api.schedlr.schedlr_api_integration.DTOs.CollaborationWithUsernameDTO;
 import com.api.schedlr.schedlr_api_integration.DTOs.InfluencerRequest;
 import com.api.schedlr.schedlr_api_integration.DTOs.InfluencerWithUserNameDTO;
 import com.api.schedlr.schedlr_api_integration.Service.InfluencerService;
+import com.api.schedlr.schedlr_api_integration.entity.Collaboration;
 import com.api.schedlr.schedlr_api_integration.entity.Influencer;
 import com.api.schedlr.schedlr_api_integration.entity.User;
 import lombok.extern.slf4j.Slf4j;
@@ -43,8 +45,8 @@ public class MarketPlaceController {
     public CollaborationRequestDto findByUserId(
             @PathVariable int userId,
             @RequestBody InfluencerRequest request) {
-        log.info("UserId: "+ userId);
-        log.info("Request: "+ request);
+        log.info("UserId: " + userId);
+        log.info("Request: " + request);
         InfluencerWithUserNameDTO influencerWithUserNameDTO =
                 influencerService.findAllInfluencerById(request.getInfluencerId(), request.getInfluencerName());
 
@@ -56,7 +58,34 @@ public class MarketPlaceController {
 
 
     @GetMapping("/check")
-    public String test(){
+    public String test() {
         return "Thanks";
+    }
+
+    @PostMapping("/changeStatus")
+    public Collaboration changeCollaborationStatus(@RequestParam int userId,
+                                                   @RequestParam int influencerId,
+                                                   @RequestParam String status) {
+        return influencerService.updateCollaborationStatus(userId, influencerId, status.toUpperCase());
+    }
+
+    @PostMapping("/raiseCollabReq")
+    public Collaboration raiseCollaborationRequest(@RequestParam int userId,
+                                                   @RequestParam int influencerId,
+                                                   @RequestParam String message) {
+        return influencerService.raiseCollaborationRequest(userId, influencerId, message);
+    }
+
+    @DeleteMapping("/deleteCollab")
+    public ResponseEntity<String> deleteCollaboration(
+            @RequestParam int userId,
+            @RequestParam int influencerId) {
+        influencerService.deleteCollaboration(userId, influencerId);
+        return ResponseEntity.ok("Collaboration deleted successfully.");
+    }
+
+    @GetMapping("/CollaborationReqs")
+    public List<CollaborationWithUsernameDTO>getCollaborationRequests(@RequestParam int influencerId){
+        return influencerService.getPendingCollaborationRequestsWithUsernames(influencerId);
     }
 }
