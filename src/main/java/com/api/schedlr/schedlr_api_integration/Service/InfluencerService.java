@@ -96,6 +96,13 @@ public class InfluencerService {
     }
 
     public Collaboration raiseCollaborationRequest(int userId, int influencerId, String message) {
+        Optional<Collaboration> existingCollaboration = collaborationRepository.findByUserIdAndInfluencerId(userId, influencerId);
+
+        if (existingCollaboration.isPresent()) {
+            // If collaboration exists, return it (or throw an exception if needed)
+            return existingCollaboration.get();
+        }
+
         Collaboration collaboration = new Collaboration();
         collaboration.setUserId(userId);
         collaboration.setInfluencerId(influencerId);
