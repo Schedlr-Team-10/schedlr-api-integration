@@ -89,6 +89,8 @@ public class InfluencerService {
             log.info("Status : ", Collaboration.Status.valueOf(status));
             if(Collaboration.Status.valueOf(status).equals(Collaboration.Status.COMPLETED)){
                 collaboration.setCollaborationToken(generateToken(userId, influencerId));
+            }else {
+                collaboration.setCollaborationToken(null);
             }
             collaboration.setStatus(Collaboration.Status.valueOf(status));
             return collaborationRepository.save(collaboration);
@@ -103,7 +105,7 @@ public class InfluencerService {
         collaboration.setInfluencerId(influencerId);
         collaboration.setMessage(message);
         collaboration.setStatus(Collaboration.Status.PENDING);
-        collaboration.setCollaborationToken("");
+        collaboration.setCollaborationToken(null);
         return collaborationRepository.save(collaboration);
     }
 
