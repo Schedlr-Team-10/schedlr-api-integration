@@ -21,4 +21,8 @@ public interface CollaborationRepository extends JpaRepository<Collaboration, In
     List<Object[]> findByInfluencerIdAndStatusWithUsernames(
             @Param("influencerId") int influencerId
     );
+
+    @Query("SELECT c.influencerId FROM Collaboration c WHERE c.collaborationToken = :collaborationToken")
+    Optional<Integer> findInfluencerIdByCollaborationToken(@Param("collaborationToken") String collaborationToken);
+
 }

@@ -15,14 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -174,6 +170,11 @@ public class InfluencerService {
 
         Influencer savedInfluencer = influencerRepository.save(influencer);
         return savedInfluencer;
+    }
+
+    public Integer getInfluencerIdByToken(String collaborationToken) {
+        return collaborationRepository.findInfluencerIdByCollaborationToken(collaborationToken)
+                .orElseThrow(() -> new NoSuchElementException("No collaboration found for token: " + collaborationToken));
     }
 
 }

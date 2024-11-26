@@ -107,4 +107,9 @@ public class MarketPlaceController {
         return ResponseEntity.ok(updatedInfluencer);
     }
 
+    @GetMapping("/checkCollabCode")
+    public int checkCollaborationCode(@RequestParam String code){
+        return influencerService.getInfluencerIdByToken(code);
+    }
+
 }
