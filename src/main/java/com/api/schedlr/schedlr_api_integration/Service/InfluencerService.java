@@ -40,7 +40,7 @@ public class InfluencerService {
     }
 
     public InfluencerWithUserNameDTO convertInflucnerWithUserDto(Influencer influencer, String name){
-        InfluencerWithUserNameDTO influencerWithUserNameDTO = new InfluencerWithUserNameDTO(influencer.getId(),
+        InfluencerWithUserNameDTO influencerWithUserNameDTO = new InfluencerWithUserNameDTO(influencer.getUserid(),
                 influencer.getLinkedinProfile(),
                 influencer.getPinterestProfile(), influencer.getTwitterProfile(), influencer.getPricePerPhoto(),
                 influencer.getTags(), name );
