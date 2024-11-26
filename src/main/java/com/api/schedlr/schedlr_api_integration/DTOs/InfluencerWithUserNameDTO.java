@@ -25,22 +25,14 @@ public class InfluencerWithUserNameDTO {
 
     // Constructor, Getters, and Setters
 
-    public InfluencerWithUserNameDTO(int  influencerId, byte[] profilePic, String bio, int linkedinFollowers,
-                                     int pinterestFollowers, int twitterFollowers, String linkedinProfile,
+    public InfluencerWithUserNameDTO(int  influencerId, String linkedinProfile,
                                      String pinterestProfile, String twitterProfile, int pricePerPhoto,
-                                     int pricePerVideo, int pricePerTweet, List<String> tags, String username) {
+                                     List<String> tags, String username) {
         this.influencerId = influencerId;
-        this.profilePic = profilePic;
-        this.bio = bio;
-        this.linkedinFollowers = linkedinFollowers;
-        this.pinterestFollowers = pinterestFollowers;
-        this.twitterFollowers = twitterFollowers;
         this.linkedinProfile = linkedinProfile;
         this.pinterestProfile = pinterestProfile;
         this.twitterProfile = twitterProfile;
         this.pricePerPhoto = pricePerPhoto;
-        this.pricePerVideo = pricePerVideo;
-        this.pricePerTweet = pricePerTweet;
         this.tags = tags;
         this.name = username;
     }

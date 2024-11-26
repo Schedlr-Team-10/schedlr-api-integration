@@ -9,6 +9,7 @@ import com.api.schedlr.schedlr_api_integration.entity.User;
 import com.api.schedlr.schedlr_api_integration.repo.CollaborationRepository;
 import com.api.schedlr.schedlr_api_integration.repo.InfluencerRepository;
 import com.api.schedlr.schedlr_api_integration.repo.UserRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,41 +37,17 @@ public class InfluencerService {
     @Autowired
     CollaborationRepository collaborationRepository;
 
-    public Influencer getInfluencersByUserId(int userid) {
-        return influencerRepository.findByUserid(userid);
-    }
+
 
     public Influencer saveInfluencer(Influencer influencer) {
         return influencerRepository.save(influencer);
     }
 
-    public List<InfluencerWithUserNameDTO> findAllInfluencers() {
-        return addNameToList(influencerRepository.findAll());
-    }
-
-    public List<InfluencerWithUserNameDTO> addNameToList(List<Influencer> influencersList){
-
-        List<InfluencerWithUserNameDTO> influencerWithUserNameDTOSList = new ArrayList<>();
-        influencersList.forEach(influencer -> {
-
-            Optional<User> user = userRepository.findByUserid(influencer.getUserid());
-            String name = user.map(User::getUsername).orElse("Default Username");
-            InfluencerWithUserNameDTO influencerWithUserNameDTO = new InfluencerWithUserNameDTO(influencer.getInfluencerId(),
-                    influencer.getProfilePic(), influencer.getBio(), influencer.getLinkedinFollowers(),
-                    influencer.getPinterestFollowers(), influencer.getTwitterFollowers(), influencer.getLinkedinProfile(),
-                    influencer.getPinterestProfile(), influencer.getTwitterProfile(), influencer.getPricePerPhoto(),
-                    influencer.getPricePerVideo(), influencer.getPricePerTweet(), influencer.getTags(), name );
-            influencerWithUserNameDTOSList.add(influencerWithUserNameDTO);
-        });
-        return influencerWithUserNameDTOSList;
-    }
-
     public InfluencerWithUserNameDTO convertInflucnerWithUserDto(Influencer influencer, String name){
-        InfluencerWithUserNameDTO influencerWithUserNameDTO = new InfluencerWithUserNameDTO(influencer.getInfluencerId(),
-                influencer.getProfilePic(), influencer.getBio(), influencer.getLinkedinFollowers(),
-                influencer.getPinterestFollowers(), influencer.getTwitterFollowers(), influencer.getLinkedinProfile(),
+        InfluencerWithUserNameDTO influencerWithUserNameDTO = new InfluencerWithUserNameDTO(influencer.getId(),
+                influencer.getLinkedinProfile(),
                 influencer.getPinterestProfile(), influencer.getTwitterProfile(), influencer.getPricePerPhoto(),
-                influencer.getPricePerVideo(), influencer.getPricePerTweet(), influencer.getTags(), name );
+                influencer.getTags(), name );
         return influencerWithUserNameDTO;
     }
 
@@ -163,4 +140,38 @@ public class InfluencerService {
                 ))
                 .toList();
     }
+
+    public Influencer saveOrUpdateInfluencerProfile(int userid, String linkedinProfile,
+                                                    String pinterestProfile, String twitterProfile,
+                                                    int pricePerPhoto) {
+
+        Optional<Influencer> influencerOpt = Optional.ofNullable(influencerRepository.findByUserid(userid));
+
+        Influencer influencer;
+
+        if (influencerOpt.isPresent()) {
+            influencer = influencerOpt.get();
+            influencer.setLinkedinProfile(linkedinProfile);
+            influencer.setPinterestProfile(pinterestProfile);
+            influencer.setTwitterProfile(twitterProfile);
+            influencer.setPricePerPhoto(pricePerPhoto);
+            influencer.setTags(null);
+
+            log.info("Updating existing Influencer with userid: {}", userid);
+        } else {
+            influencer = new Influencer();
+            influencer.setUserid(userid);
+            influencer.setLinkedinProfile(linkedinProfile);
+            influencer.setPinterestProfile(pinterestProfile);
+            influencer.setTwitterProfile(twitterProfile);
+            influencer.setPricePerPhoto(pricePerPhoto);
+            influencer.setTags(null);
+
+            log.info("Creating new Influencer with userid: {}", userid);
+        }
+
+        Influencer savedInfluencer = influencerRepository.save(influencer);
+        return savedInfluencer;
+    }
+
 }

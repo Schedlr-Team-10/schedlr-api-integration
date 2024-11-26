@@ -88,4 +88,23 @@ public class MarketPlaceController {
     public List<CollaborationWithUsernameDTO>getCollaborationRequests(@RequestParam int influencerId){
         return influencerService.getPendingCollaborationRequestsWithUsernames(influencerId);
     }
+
+    @PostMapping("/saveOrUpdate")
+    public ResponseEntity<Influencer> saveOrUpdateInfluencer(
+            @RequestParam(required = false) Integer influencerId,
+            @RequestParam String linkedinProfile,
+            @RequestParam String pinterestProfile,
+            @RequestParam String twitterProfile,
+            @RequestParam int pricePerPhoto) {
+
+        if (influencerId == null) {
+            return null;
+        }
+
+        Influencer updatedInfluencer = influencerService.saveOrUpdateInfluencerProfile(
+                influencerId, linkedinProfile, pinterestProfile, twitterProfile, pricePerPhoto);
+
+        return ResponseEntity.ok(updatedInfluencer);
+    }
+
 }
