@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient; // Use classes from Apache HttpClient 5.x
-import org.apache.hc.client5.http.impl.classic.HttpClients;
+
 
 
 import java.io.File;
@@ -224,13 +222,13 @@ public class LinkedinService {
 
         specificContent.put("com.linkedin.ugc.ShareContent", Map.of(
                 "shareCommentary", shareCommentary,
-                "shareMediaCategory", "IMAGE", // Or "VIDEO"
+                "shareMediaCategory", "IMAGE",
                 "media", new Object[] { mediaData }
         ));
 
         requestBody.put("specificContent", specificContent);
         requestBody.put("visibility", Map.of(
-                "com.linkedin.ugc.MemberNetworkVisibility", "PUBLIC" // Or "CONNECTIONS"
+                "com.linkedin.ugc.MemberNetworkVisibility", "PUBLIC"
         ));
 
         try {

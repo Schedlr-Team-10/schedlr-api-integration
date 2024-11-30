@@ -3,7 +3,6 @@ package com.api.schedlr.schedlr_api_integration.Service;
 import com.api.schedlr.schedlr_api_integration.Constants.APIConstants;
 import com.api.schedlr.schedlr_api_integration.DTOs.PinterestPostResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apiguardian.api.API;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +14,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +67,7 @@ public class PInterestService {
         // Retrieve and store the 'id' from the response
         if (response.getBody() != null) {
             String postId = response.getBody().getId();
-            log.info("Post ID: " + postId); // Store or use the ID as needed
+            log.info("Post ID: " + postId);
             return postId;
         }
 

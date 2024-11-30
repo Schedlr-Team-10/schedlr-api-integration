@@ -9,7 +9,6 @@ import com.api.schedlr.schedlr_api_integration.entity.User;
 import com.api.schedlr.schedlr_api_integration.repo.CollaborationRepository;
 import com.api.schedlr.schedlr_api_integration.repo.InfluencerRepository;
 import com.api.schedlr.schedlr_api_integration.repo.UserRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

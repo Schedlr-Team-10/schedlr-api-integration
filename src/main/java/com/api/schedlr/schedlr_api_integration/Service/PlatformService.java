@@ -22,7 +22,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -80,7 +79,7 @@ public class PlatformService {
         } else {
             // If profile doesn't exist, create a new one
             Profile newProfile = new Profile();
-            newProfile.setUserId(user.getUserid());  // Set the User object
+            newProfile.setUserId(user.getUserid());
             newProfile.setLinkedInAccessToken(linkedInAccessToken);
             newProfile.setLinkedInAccessTokenExpireDate(linkedInAccessTokenExpireDate);
             newProfile.setLinkedInPersonId(linkedInPersonId);
@@ -154,7 +153,7 @@ public class PlatformService {
             Map<String, Object> responseBody = objectMapper.readValue(response.getBody(), Map.class);
             log.info("Response : "+ responseBody);
             // Extract the "id" value (not "sub")
-            String personId = responseBody.get("sub").toString(); // Adjust this based on the actual response
+            String personId = responseBody.get("sub").toString();
 
             return personId;
 
@@ -246,7 +245,7 @@ public class PlatformService {
         } else {
             // If profile doesn't exist, create a new one
             Profile newProfile = new Profile();
-            newProfile.setUserId(user.getUserid());  // Set the User object
+            newProfile.setUserId(user.getUserid());
             newProfile.setPinterestAccessToken(pInterestAccessToken);
             newProfile.setPinterestAccessTokenExpireDate(pinterestAccessTokenExpireDate);
             // Save the new profile
