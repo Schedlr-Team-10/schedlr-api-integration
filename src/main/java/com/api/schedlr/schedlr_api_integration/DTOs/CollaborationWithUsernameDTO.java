@@ -11,4 +11,20 @@ public class CollaborationWithUsernameDTO {
         this.collaboration = collaboration;
         this.username = username;
     }
+
+    public Collaboration getCollaboration() {
+        return collaboration;
+    }
+
+    public void setCollaboration(Collaboration collaboration) {
+        this.collaboration = collaboration;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }

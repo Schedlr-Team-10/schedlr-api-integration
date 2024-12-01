@@ -38,4 +38,52 @@ public class Collaboration {
         PAYMENT_PENDING,
         COMPLETED
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getInfluencerId() {
+        return influencerId;
+    }
+
+    public void setInfluencerId(int influencerId) {
+        this.influencerId = influencerId;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public String getCollaborationToken() {
+        return collaborationToken;
+    }
+
+    public void setCollaborationToken(String collaborationToken) {
+        this.collaborationToken = collaborationToken;
+    }
 }
