@@ -38,6 +38,8 @@ spring:
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
+app:
+  service-url: http://localhost:3000
 
 # Production profile-specific configurations
 ---
@@ -50,3 +52,5 @@ spring:
     username: root
     password: schedlr10
     driver-class-name: com.mysql.cj.jdbc.Driver
+app:
+  service-url: http://52.64.225.94:3000

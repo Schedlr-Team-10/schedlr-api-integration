@@ -84,3 +84,8 @@ FOREIGN KEY (influencer_id) REFERENCES schedlr.users(userid),
 CONSTRAINT check_user_influencer CHECK (user_id <> influencer_id)
 );
 
+# To install java in AWS EC2 Amazon
+sudo dnf install java-17-amazon-corretto
+
+# To run the jar file continuosly in the AWS EC2 Instance
+nohup java -jar jarfile.jar > output.log 2>&1 &
