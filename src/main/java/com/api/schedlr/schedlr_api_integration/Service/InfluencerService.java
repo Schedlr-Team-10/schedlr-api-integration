@@ -177,7 +177,17 @@ public class InfluencerService {
         Influencer savedInfluencer = influencerRepository.save(influencer);
         return savedInfluencer;
     }
+    public static String generateTwitterTokens(int userId, int influencerId) {
+        String input = userId + "-" + influencerId + "-" + UUID.randomUUID().toString();
 
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Failed to generate token", e);
+        }
+    }
     public Integer getInfluencerIdByToken(String collaborationToken) {
         return collaborationRepository.findInfluencerIdByCollaborationToken(collaborationToken)
                 .orElseThrow(() -> new NoSuchElementException("No collaboration found for token: " + collaborationToken));
