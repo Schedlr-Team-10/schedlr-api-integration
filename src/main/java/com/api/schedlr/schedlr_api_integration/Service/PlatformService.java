@@ -87,28 +87,29 @@ public class PlatformService {
             return profileRepository.save(newProfile);
         }
     }
-    public String twitterAccessToken(int userProfileId, String authorizationCode, String callbackState) {
-        String accessTokenEndpoint = APIConstants.LINKEDIN_GET_ACCESS_TOKEN;
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("grant_type", "authorization_code");
-        formData.add("code", authorizationCode);
-        formData.add("redirect_uri", APIConstants.LINKEDIN_REDIRECT_URL);
-        formData.add("client_id", APIConstants.CLIENT_ID);
-        formData.add("client_secret", APIConstants.CLIENT_SECRET);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
-        try {
-            ResponseEntity<Map> response = networkRequestTemplate.exchange(accessTokenEndpoint, HttpMethod.POST, requestEntity, Map.class);
-            String accessToken = (String) response.getBody().get("access_token");
-            String userId = fetchLinkedInUserId(accessToken);
-            Profile profile = configureLinkedInProfile(userProfileId, accessToken, userId);
-            return (profile != null) ? "Success" : "Failed";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Failed";
-        }
-    }
+//    public String twitterAccessToken(int userProfileId, String authorizationCode, String callbackState) {
+//        String accessTokenEndpoint = APIConstants.LINKEDIN_GET_ACCESS_TOKEN;
+//        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+//        formData.add("grant_type", "authorization_code");
+//        formData.add("code", authorizationCode);
+//        formData.add("redirect_uri", APIConstants.LINKEDIN_REDIRECT_URL);
+//        formData.add("client_id", APIConstants.CLIENT_ID);
+//        formData.add("client_secret", APIConstants.CLIENT_SECRET);
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
+//        try {
+//            ResponseEntity<Map> response = networkRequestTemplate.exchange(accessTokenEndpoint, HttpMethod.POST, requestEntity, Map.class);
+//            String accessToken = (String) response.getBody().get("access_token");
+//            String userId = fetchLinkedInUserId(accessToken);
+//            Profile profile = configureLinkedInProfile(userProfileId, accessToken, userId);
+//            return (profile != null) ? "Success" : "Failed";
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return "Failed";
+//        }
+//    }
+
     public String getAccessToken(int userId, String code, String state) {
 
         String tokenUrl = APIConstants.LINKEDIN_GET_ACCESS_TOKEN;
