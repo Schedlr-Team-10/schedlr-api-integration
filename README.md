@@ -1,3 +1,26 @@
+Schedlr is an AI-powered social media management tool designed to simplify and automate content creation, scheduling, and performance tracking. It helps users—especially influencers, marketers, and small businesses—manage posts across multiple platforms like LinkedIn, Instagram, and Twitter from a single dashboard. Key features include:
+
+AI-generated content assistant
+
+Multi-platform post scheduling
+
+Post performance analytics
+
+Built-in marketplace for content exchange
+
+Profile and team collaboration tools
+
+Schedlr is built using ReactJS (frontend), Spring Boot (backend), MySQL (database)
+
+
+
+
+
+
+
+
+
+
 # schedlr-api-integration
 
 
